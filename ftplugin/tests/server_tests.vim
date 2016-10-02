@@ -2,8 +2,8 @@ function! _Vimpair_test_listen_to_server()
 python << EOF
 import socket
 import vim
-client_socket = socket.socket()
-client_socket.settimeout(3.)
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.settimeout(1.)
 client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 try:
     client_socket.bind((socket.gethostbyname(socket.gethostname()), 50007))
