@@ -1,3 +1,7 @@
+function! _VimpairUpdate()
+  python server.update()
+endfunction
+
 function! VimpairServerStart()
 python << EOF
 import sys, os, vim
@@ -11,9 +15,19 @@ EOF
 
   python server = VimpairServer()
   python server.start()
+
+  augroup Vimpair
+    autocmd TextChanged * call _VimpairUpdate()
+    autocmd TextChangedI * call _VimpairUpdate()
+    autocmd InsertLeave * call _VimpairUpdate()
+  augroup END
 endfunction
 
 function! VimpairServerStop()
+  augroup Vimpair
+    autocmd!
+  augroup END
+
   python server.stop()
   python server = None
 endfunction
