@@ -1,21 +1,23 @@
 import vim
-import Queue
 
 from connection import ServerConnection
+from editor_controller import EditorController
 from runloop import Runloop
 from vim_interface import VimInterface
 
 class VimpairServer(object):
 
     def __init__(self, *a, **k):
-        self._editor_interface = VimInterface(vim=vim)
-        self._connection = ServerConnection()
-        self._runloop = Runloop(
-            setup=self._connection.connect,
-            process=self._serve,
-            cleanup=self._connection.disconnect
+        connection = ServerConnection()
+        self._editor_controller = EditorController(
+            editor_interface=VimInterface(vim=vim),
+            process_callback=connection.send
         )
-        self._queue = Queue.Queue()
+        self._runloop = Runloop(
+            setup=connection.connect,
+            process=self._editor_controller.process_next,
+            cleanup=connection.disconnect
+        )
 
     def start(self):
         self._runloop.start()
@@ -25,10 +27,4 @@ class VimpairServer(object):
         self._runloop.stop()
 
     def update(self):
-        self._queue.put_nowait(self._editor_interface.current_contents)
-
-    def _serve(self):
-        try:
-            self._connection.send(self._queue.get(block=True, timeout=1))
-        except Queue.Empty:
-            pass
+        self._editor_controller.content_changed()
