@@ -10,10 +10,10 @@ sys.path.append(
         os.path.join(vim.eval('expand("<sfile>:p:h")'), 'ftplugin', 'python')
     )
 )
-from vimpair_server import VimpairServer
+from vimpair_server import create_server
 EOF
 
-  python server = VimpairServer()
+  python server = create_server()
   python server.start()
 
   augroup Vimpair
