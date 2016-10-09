@@ -1,4 +1,3 @@
-import time
 import threading
 
 
@@ -19,7 +18,6 @@ class Runloop(object):
         self._thread.join()
 
     def _run(self):
-        time.sleep(.5)
         try:
             self._setup()
             while (self._is_serving):

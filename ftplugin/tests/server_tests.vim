@@ -2,17 +2,16 @@ function! _Vimpair_test_listen_to_server(Keep_connection_alive)
 python << EOF
 import socket
 import vim
+import time
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.settimeout(1.)
-client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-client_socket.bind((socket.gethostbyname(socket.gethostname()), 50007))
-client_socket.listen(1)
-
-connection, _address = client_socket.accept()
-connection.setblocking(1)
+time.sleep(.5)
+client_socket.connect(
+    (socket.gethostbyname(socket.gethostname()), 50007)
+)
 
 def fetch_server_output():
-    received = connection.recv(1024)
+    received = client_socket.recv(1024)
     vim.vars['Vimpair_test_output'] = received
 
 fetch_server_output()
