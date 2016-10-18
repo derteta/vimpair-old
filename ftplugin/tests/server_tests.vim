@@ -29,7 +29,7 @@ function! Vimpair_server_sends_buffer_content_to_connected_client()
   let Keep_connection_alive = 0
   call _Vimpair_test_listen_to_server(Keep_connection_alive)
 
-  call assert_match('.*' . g:Vimpair_test_content . '.*', g:Vimpair_test_output)
+  call _Vimpair_assert_output_contains(g:Vimpair_test_content)
 endfunction
 
 function! Vimpair_server_sends_buffer_content_on_changes()
@@ -41,7 +41,7 @@ function! Vimpair_server_sends_buffer_content_on_changes()
   python fetch_server_output()
   python client_socket.close()
 
-  call assert_match('.*Adding some more.*', g:Vimpair_test_output)
+  call _Vimpair_assert_output_contains('Adding some more')
 endfunction
 
 function! Vimpair_server_sends_cursor_position_to_connected_client()
@@ -50,7 +50,7 @@ function! Vimpair_server_sends_cursor_position_to_connected_client()
   let Keep_connection_alive = 0
   call _Vimpair_test_listen_to_server(Keep_connection_alive)
 
-  call assert_match('.*(1, 0).*', g:Vimpair_test_output)
+  call _Vimpair_assert_output_contains('(1, 0)')
 endfunction
 
 

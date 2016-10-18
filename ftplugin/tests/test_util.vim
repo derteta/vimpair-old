@@ -12,6 +12,10 @@ function! _Vimpair_test_tearDown()
   execute("q!")
 endfunction
 
+function! _Vimpair_assert_output_contains(Text)
+  call assert_match('.*' . a:Text . '.*', g:Vimpair_test_output)
+endfunction
+
 function! _Vimpair_test_show_results()
   if v:errors == []
     echo "Vimpair: All tests passed"
