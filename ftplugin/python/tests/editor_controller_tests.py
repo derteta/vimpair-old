@@ -21,6 +21,9 @@ class EditorControllerTests(unittest.TestCase):
     def process(self, message):
         self.last_processed_message = message
 
+    def assertHasContent(self, expected):
+        self.assertEqual(self.last_processed_message['content'], expected)
+
 
     def test_nothing_is_processed_when_processing_without_changes(self):
         self.controller.process_next()
@@ -37,7 +40,7 @@ class EditorControllerTests(unittest.TestCase):
 
         self.controller.process_next()
 
-        self.assertEqual(self.last_processed_message, "Test Content")
+        self.assertHasContent("Test Content")
 
     def test_processed_content_reflects_editor_content(self):
         self.editor_interface.current_contents += ", now with changes"
@@ -45,7 +48,4 @@ class EditorControllerTests(unittest.TestCase):
 
         self.controller.process_next()
 
-        self.assertEqual(
-            self.last_processed_message,
-            "Test Content, now with changes",
-        )
+        self.assertHasContent("Test Content, now with changes")

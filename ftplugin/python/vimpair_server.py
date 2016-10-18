@@ -27,7 +27,7 @@ def create_server():
     connection = ServerConnection()
     editor_controller = EditorController(
         editor_interface=VimInterface(vim=vim),
-        process_callback=connection.send
+        process_callback=lambda o: connection.send(str(o))
     )
     runloop = Runloop(
         setup=connection.connect,
