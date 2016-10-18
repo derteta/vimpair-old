@@ -44,9 +44,19 @@ function! Vimpair_server_sends_buffer_content_on_changes()
   call assert_match('.*Adding some more.*', g:Vimpair_test_output)
 endfunction
 
+function! Vimpair_server_sends_cursor_position_to_connected_client()
+  call VimpairServerStart()
+
+  let Keep_connection_alive = 0
+  call _Vimpair_test_listen_to_server(Keep_connection_alive)
+
+  call assert_match('.*(1, 0).*', g:Vimpair_test_output)
+endfunction
+
 
 execute("source " . expand("<sfile>:p:h") . "/test_util.vim")
 
 call _Vimpair_run_tests(
       \ [function("Vimpair_server_sends_buffer_content_to_connected_client"),
-      \  function("Vimpair_server_sends_buffer_content_on_changes")])
+      \  function("Vimpair_server_sends_buffer_content_on_changes"),
+      \  function("Vimpair_server_sends_cursor_position_to_connected_client")])

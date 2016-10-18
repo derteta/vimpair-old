@@ -5,6 +5,7 @@ from ..editor_controller import EditorController
 class EditorInterfaceStub(object):
 
     current_contents = "Test Content"
+    cursor_position = (0,0)
 
 
 class EditorControllerTests(unittest.TestCase):
@@ -21,8 +22,14 @@ class EditorControllerTests(unittest.TestCase):
     def process(self, message):
         self.last_processed_message = message
 
+    def assertHasItem(self, key, value):
+        self.assertEqual(self.last_processed_message[key], value)
+
     def assertHasContent(self, expected):
-        self.assertEqual(self.last_processed_message['content'], expected)
+        self.assertHasItem('content', expected)
+
+    def assertHasCursorPosition(self, expected):
+        self.assertHasItem('cursor', expected)
 
 
     def test_nothing_is_processed_when_processing_without_changes(self):
@@ -49,3 +56,18 @@ class EditorControllerTests(unittest.TestCase):
         self.controller.process_next()
 
         self.assertHasContent("Test Content, now with changes")
+
+    def test_changed_content_is_processed_next_with_cursor_position(self):
+        self.controller.content_changed()
+
+        self.controller.process_next()
+
+        self.assertHasCursorPosition((0,0))
+
+    def test_processed_content_reflects_editor_cursor_position(self):
+        self.editor_interface.cursor_position = (33,33)
+        self.controller.content_changed()
+
+        self.controller.process_next()
+
+        self.assertHasCursorPosition((33,33))

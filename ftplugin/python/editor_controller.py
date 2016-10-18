@@ -16,7 +16,12 @@ class EditorController(object):
         self._processing_should_block = processing_should_block
 
     def content_changed(self):
-        self._queue.put_nowait(dict(content=self._editor_interface.current_contents))
+        self._queue.put_nowait(
+            dict(
+                content=self._editor_interface.current_contents,
+                cursor=self._editor_interface.cursor_position,
+            )
+        )
 
     def process_next(self):
         try:
