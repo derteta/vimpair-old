@@ -54,10 +54,22 @@ function! Vimpair_server_sends_cursor_position_to_connected_client()
   call _Vimpair_assert_output_contains('(1, 0)')
 endfunction
 
+function! Vimpair_server_sends_cursor_position_on_changes()
+  call VimpairServerStart()
+  let Keep_connection_alive = 1
+  call _Vimpair_test_listen_to_server(Keep_connection_alive)
+
+  execute("normal A. Adding some more")
+
+  python fetch_server_output()
+  call _Vimpair_assert_output_contains('(1, 17)')
+endfunction
+
 
 execute("source " . expand("<sfile>:p:h") . "/test_util.vim")
 
 call _Vimpair_run_tests(
       \ [function("Vimpair_server_sends_buffer_content_to_connected_client"),
       \  function("Vimpair_server_sends_buffer_content_on_changes"),
-      \  function("Vimpair_server_sends_cursor_position_to_connected_client")])
+      \  function("Vimpair_server_sends_cursor_position_to_connected_client"),
+      \  function("Vimpair_server_sends_cursor_position_on_changes")])

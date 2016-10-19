@@ -20,6 +20,8 @@ EOF
     autocmd TextChanged * call _VimpairUpdate()
     autocmd TextChangedI * call _VimpairUpdate()
     autocmd InsertLeave * call _VimpairUpdate()
+    autocmd CursorMoved * call _VimpairUpdate()
+    autocmd CursorMovedI * call _VimpairUpdate()
   augroup END
 endfunction
 
