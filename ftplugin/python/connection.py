@@ -17,6 +17,7 @@ class ServerConnection(object):
 
     def disconnect(self):
         self._socket.close()
+        self._connection = None
 
     def send(self, message):
         self._connection.sendall(message)
