@@ -8,12 +8,20 @@ class ServerConnection(object):
         self._socket.settimeout(1.)
         self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._connection = None
+        try:
+            self._socket.bind(
+                (socket.gethostbyname(socket.gethostname()), 50007)
+            )
+        except:
+            pass
 
     def connect(self):
-        self._socket.bind((socket.gethostbyname(socket.gethostname()), 50007))
-        self._socket.listen(1)
-        self._connection, _address = self._socket.accept()
-        self._connection.setblocking(1)
+        try:
+            self._socket.listen(1)
+            self._connection, _address = self._socket.accept()
+            self._connection.setblocking(1)
+        except socket.timeout:
+            pass
 
     def disconnect(self):
         self._socket.close()

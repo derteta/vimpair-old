@@ -11,6 +11,10 @@ def fake_accept(self):
 def fake_accept_with_real_socket(self):
     return socket.socket(), 0
 
+def fake_accept_raising_timeout(self):
+    raise socket.timeout
+    return socket.socket(), 0
+
 
 class ServerConnectionTests(unittest.TestCase):
 
@@ -66,3 +70,9 @@ class ServerConnectionTests(unittest.TestCase):
         connection.send('<message>')
 
         self.assertEqual(connection.connect.mock_calls, [call()])
+
+    @patch('socket.socket.accept', new_callable=lambda: fake_accept_raising_timeout)
+    def test_connect_catches_socket_timeout(self, _):
+        connection = ServerConnection()
+
+        connection.connect()

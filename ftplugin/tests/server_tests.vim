@@ -2,10 +2,8 @@ function! _Vimpair_test_listen_to_server(Keep_connection_alive)
 python << EOF
 import socket
 import vim
-import time
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.settimeout(1.)
-time.sleep(.5)
 client_socket.connect(
     (socket.gethostbyname(socket.gethostname()), 50007)
 )
