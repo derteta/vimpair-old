@@ -19,5 +19,11 @@ class ServerConnection(object):
         self._socket.close()
         self._connection = None
 
+    def _ensure_has_connection(self):
+        if self._connection is None:
+            self.connect()
+        return self._connection is not None
+
     def send(self, message):
-        self._connection.sendall(message)
+        if self._ensure_has_connection():
+            self._connection.sendall(message)

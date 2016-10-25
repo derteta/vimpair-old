@@ -1,5 +1,5 @@
 import unittest
-from mock import ANY, patch, Mock
+from mock import ANY, call, patch, Mock
 
 import socket
 from ..connection import ServerConnection
@@ -57,3 +57,12 @@ class ServerConnectionTests(unittest.TestCase):
         connection.send('<message>')
 
         sendall_mock.assert_called_with('<message>')
+
+    @patch('socket.socket.accept', new_callable=lambda: fake_accept)
+    def test_send_calls_connect_implicitely_if_no_connection_established(self, _):
+        connection = ServerConnection()
+        connection.connect = Mock()
+
+        connection.send('<message>')
+
+        self.assertEqual(connection.connect.mock_calls, [call()])
