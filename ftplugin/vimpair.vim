@@ -1,8 +1,4 @@
-function! _VimpairUpdate()
-  python server.update()
-endfunction
-
-function! VimpairServerStart()
+function! _VimpairPythonSetup()
 python << EOF
 import sys, os, vim
 sys.path.append(
@@ -11,8 +7,16 @@ sys.path.append(
     )
 )
 from vimpair_server import create_server
-EOF
 
+server = None
+EOF
+endfunction
+
+function! _VimpairUpdate()
+  python server.update()
+endfunction
+
+function! VimpairServerStart()
   python server = create_server()
   python server.start()
 
@@ -30,6 +34,8 @@ function! VimpairServerStop()
     autocmd!
   augroup END
 
-  python server.stop()
+  python if server is not None: server.stop()
   python server = None
 endfunction
+
+call _VimpairPythonSetup()
