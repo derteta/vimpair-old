@@ -57,6 +57,11 @@ class EditorControllerTests(unittest.TestCase):
 
         self.assertHasContent("Test Content, now with changes")
 
+    def test_content_of_editor_can_be_set(self):
+        self.controller.set_current_contents("Some other content")
+
+        self.assertEqual(self.editor_interface.current_contents, "Some other content")
+
     def test_changed_content_is_processed_next_with_cursor_position(self):
         self.controller.content_changed()
 

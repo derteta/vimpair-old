@@ -30,3 +30,6 @@ class EditorController(object):
             )
         except Queue.Empty:
             pass
+
+    def set_current_contents(self, new_contents):
+        self._editor_interface.current_contents = new_contents

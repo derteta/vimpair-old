@@ -30,6 +30,14 @@ class VimInterfaceTests(unittest.TestCase):
             'This is the first line.\nThis is the second line.'
         )
 
+    def test_buffer_content_can_be_set_via_property(self):
+        mock_vim = create_mock_vim(['Always has one line'])
+        interface = VimInterface(vim=mock_vim)
+
+        interface.current_contents = 'First line\nSecond line'
+
+        self.assertEqual(mock_vim.current.buffer, ['First line', 'Second line'])
+
     def test_returns_normalised_cursor_position(self):
         mock_vim = create_mock_vim(['Only one line'])
         interface = VimInterface(vim=mock_vim)
