@@ -1,4 +1,4 @@
-function! _Vimpair_test_listen_to_server(Keep_connection_alive)
+function! _Vimpair_test_listen_to_server()
 python << EOF
 import socket
 import vim
@@ -13,29 +13,28 @@ def fetch_server_output(close_connection=True):
     vim.vars['Vimpair_test_output'] = received
     if close_connection:
       client_socket.close()
-EOF
 
-  if a:Keep_connection_alive == 1
-    python fetch_server_output(close_connection=False)
-  else
-    python fetch_server_output(close_connection=True)
-  endif
+fetch_server_output(close_connection=False)
+EOF
+endfunction
+
+function! _Vimpair_test_listen_to_server_and_shutdown()
+  call _Vimpair_test_listen_to_server()
+  python client_socket.close()
 endfunction
 
 
 function! Vimpair_server_sends_buffer_content_to_connected_client()
   call VimpairServerStart()
 
-  let Keep_connection_alive = 0
-  call _Vimpair_test_listen_to_server(Keep_connection_alive)
+  call _Vimpair_test_listen_to_server_and_shutdown()
 
   call _Vimpair_assert_output_contains(g:Vimpair_test_content)
 endfunction
 
 function! Vimpair_server_sends_buffer_content_on_changes()
   call VimpairServerStart()
-  let Keep_connection_alive = 1
-  call _Vimpair_test_listen_to_server(Keep_connection_alive)
+  call _Vimpair_test_listen_to_server()
 
   execute("normal A. Adding some more")
 
@@ -46,16 +45,14 @@ endfunction
 function! Vimpair_server_sends_cursor_position_to_connected_client()
   call VimpairServerStart()
 
-  let Keep_connection_alive = 0
-  call _Vimpair_test_listen_to_server(Keep_connection_alive)
+  call _Vimpair_test_listen_to_server_and_shutdown()
 
   call _Vimpair_assert_output_contains('(1, 0)')
 endfunction
 
 function! Vimpair_server_sends_cursor_position_on_changes()
   call VimpairServerStart()
-  let Keep_connection_alive = 1
-  call _Vimpair_test_listen_to_server(Keep_connection_alive)
+  call _Vimpair_test_listen_to_server()
 
   execute("normal A. Adding some more")
 
