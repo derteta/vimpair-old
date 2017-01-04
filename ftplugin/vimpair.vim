@@ -7,8 +7,10 @@ sys.path.append(
     )
 )
 from vimpair_server import create_server
+from vimpair_client import create_client
 
 server = None
+client = None
 EOF
 endfunction
 
@@ -36,6 +38,16 @@ function! VimpairServerStop()
 
   python if server is not None: server.stop()
   python server = None
+endfunction
+
+function! VimpairClientStart()
+  python client = create_client()
+  python client.start()
+endfunction
+
+function! VimpairClientStop()
+  python if client is not None: client.stop()
+  python client = None
 endfunction
 
 call _VimpairPythonSetup()

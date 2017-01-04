@@ -9,11 +9,17 @@ endfunction
 
 function! _Vimpair_test_tearDown()
   call VimpairServerStop()
+  call VimpairClientStop()
   execute("q!")
 endfunction
 
 function! _Vimpair_assert_output_contains(Text)
   call assert_match('.*' . a:Text . '.*', g:Vimpair_test_output)
+endfunction
+
+function! _Vimpair_assert_client_buffer_contents_is(Text)
+  " only using single line content for now
+  call assert_match(a:Text, getline(1))
 endfunction
 
 function! _Vimpair_test_show_results()
