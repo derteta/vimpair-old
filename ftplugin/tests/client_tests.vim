@@ -11,6 +11,11 @@ connection.setblocking(1)
 EOF
 endfunction
 
+function! _Vimpair_test_wait_for_client()
+  python import time; time.sleep(1)
+  call _VimpairTimerCall()
+  python server_socket.close()
+endfunction
 
 function! Vimpair_client_applies_retrieved_buffer_content()
   " Clear buffer content. Should not be filled in the first place.
@@ -20,7 +25,7 @@ function! Vimpair_client_applies_retrieved_buffer_content()
 
   python connection.sendall(vim.vars['Vimpair_test_content'])
 
-  python import time; time.sleep(1)
+  call _Vimpair_test_wait_for_client()
   call _Vimpair_assert_client_buffer_contents_is(g:Vimpair_test_content)
 endfunction
 

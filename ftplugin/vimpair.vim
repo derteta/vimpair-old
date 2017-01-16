@@ -18,6 +18,10 @@ function! _VimpairUpdate()
   python server.update()
 endfunction
 
+function! _VimpairTimerCall()
+  python if client is not None: client.on_timer()
+endfunction
+
 function! VimpairServerStart()
   python server = create_server()
   python server.start()

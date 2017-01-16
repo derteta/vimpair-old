@@ -1,5 +1,6 @@
 import vim
 import socket
+from Queue import Queue, Empty
 
 from editor_controller import EditorController
 from runloop import Runloop
@@ -15,6 +16,7 @@ class VimpairClient(object):
             process=self.retrieve,
             cleanup=self.disconnect,
         )
+        self._message_queue = Queue(maxsize=100)
 
         self.start = self._runloop.start
         self.stop = self._runloop.stop
@@ -30,12 +32,20 @@ class VimpairClient(object):
     def retrieve(self):
         try:
             new_message = str(self.client_socket.recv(1024))
-            self._editor_controller.set_current_contents(new_message)
+            self._message_queue.put(new_message)
         except socket.timeout:
             pass
 
     def disconnect(self):
         self.client_socket.close()
+
+    def on_timer(self):
+        try:
+            while True:
+                new_message = self._message_queue.get(block=False)
+                self._editor_controller.set_current_contents(new_message)
+        except Empty:
+            pass
 
 
 def create_client():
