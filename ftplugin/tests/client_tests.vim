@@ -13,7 +13,7 @@ endfunction
 
 function! _Vimpair_test_wait_for_client()
   python import time; time.sleep(1)
-  call _VimpairTimerCall()
+  call _VimpairTimerCall('')
   python server_socket.close()
 endfunction
 
