@@ -1,18 +1,17 @@
-function! _VimpairPythonSetup()
 python << EOF
 import sys, os, vim
-sys.path.append(
-    os.path.abspath(
-        os.path.join(vim.eval('expand("<sfile>:p:h")'), 'ftplugin', 'python')
-    )
+python_path = os.path.abspath(
+  os.path.join(vim.eval('expand("<sfile>:p:h")'), 'python')
 )
+if not python_path in sys.path:
+  sys.path.append(python_path)
+
 from vimpair_server import create_server
 from vimpair_client import create_client
 
 server = None
 client = None
 EOF
-endfunction
 
 let g:_VimpairClientTimer = ""
 
@@ -60,5 +59,3 @@ function! VimpairClientStop()
   python if client is not None: client.stop()
   python client = None
 endfunction
-
-call _VimpairPythonSetup()
