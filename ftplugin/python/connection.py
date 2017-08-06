@@ -35,3 +35,32 @@ class ServerConnection(object):
     def send(self, message):
         if self._ensure_has_connection():
             self._connection.sendall(message)
+
+
+class ClientConnection(object):
+
+    def __init__(
+        self,
+        message_queue,
+        socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM),
+        *a, **k
+    ):
+        self._socket = socket
+        self._socket.settimeout(3.)
+        self._message_queue = message_queue
+
+    def connect(self):
+        import time; time.sleep(1)
+        self._socket.connect(
+            (socket.gethostbyname(socket.gethostname()), 50007)
+        )
+
+    def disconnect(self):
+        self._socket.close()
+
+    def retrieve(self):
+        try:
+            new_message = str(self._socket.recv(1024))
+            self._message_queue.put(new_message)
+        except socket.timeout:
+            pass

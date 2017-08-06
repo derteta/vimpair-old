@@ -2,7 +2,9 @@ import unittest
 from mock import ANY, call, patch, Mock
 
 import socket
-from ..connection import ServerConnection
+from Queue import Empty, Queue
+
+from ..connection import ClientConnection, ServerConnection
 
 
 def fake_accept(self):
@@ -11,9 +13,8 @@ def fake_accept(self):
 def fake_accept_with_real_socket(self):
     return socket.socket(), 0
 
-def fake_accept_raising_timeout(self):
+def raise_timeout(*a):
     raise socket.timeout
-    return socket.socket(), 0
 
 
 class ServerConnectionTests(unittest.TestCase):
@@ -71,8 +72,31 @@ class ServerConnectionTests(unittest.TestCase):
 
         self.assertEqual(connection.connect.mock_calls, [call()])
 
-    @patch('socket.socket.accept', new_callable=lambda: fake_accept_raising_timeout)
+    @patch('socket.socket.accept', new_callable=lambda: raise_timeout)
     def test_connect_catches_socket_timeout(self, _):
         connection = ServerConnection()
 
         connection.connect()
+
+
+class ClientConnectionTests(unittest.TestCase):
+
+    def setUp(self):
+        self.socket = Mock()
+        self.message_queue = Queue(maxsize=100)
+        self.connection = ClientConnection(self.message_queue, socket=self.socket)
+
+
+    def test_retrieve_leaves_queue_empty_if_socket_doesnt_receive_message(self):
+        self.socket.recv.side_effect = raise_timeout
+
+        self.connection.retrieve()
+
+        self.assertRaises(Empty, self.message_queue.get, block=False)
+
+    def test_retrieve_fills_queue_with_received_message(self):
+        self.socket.recv.return_value = "124"
+
+        self.connection.retrieve()
+
+        self.assertEqual(self.message_queue.get(block=False), "124")

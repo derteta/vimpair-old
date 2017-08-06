@@ -1,7 +1,7 @@
 import vim
-import socket
 from Queue import Queue, Empty
 
+from connection import ClientConnection
 from editor_controller import EditorController
 from runloop import Runloop
 from vim_interface import VimInterface
@@ -9,35 +9,18 @@ from vim_interface import VimInterface
 
 class VimpairClient(object):
 
-    def __init__(self, editor_controller=None):
+    def __init__(
+        self,
+        editor_controller=None,
+        message_queue=None,
+        runloop=None,
+        *a, **k
+    ):
+        self._message_queue = message_queue
         self._editor_controller = editor_controller
-        self._runloop = Runloop(
-            setup=self.connect,
-            process=self.retrieve,
-            cleanup=self.disconnect,
-        )
-        self._message_queue = Queue(maxsize=100)
 
-        self.start = self._runloop.start
-        self.stop = self._runloop.stop
-
-    def connect(self):
-        import time; time.sleep(1)
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.settimeout(3.)
-        self.client_socket.connect(
-            (socket.gethostbyname(socket.gethostname()), 50007)
-        )
-
-    def retrieve(self):
-        try:
-            new_message = str(self.client_socket.recv(1024))
-            self._message_queue.put(new_message)
-        except socket.timeout:
-            pass
-
-    def disconnect(self):
-        self.client_socket.close()
+        self.start = runloop.start
+        self.stop = runloop.stop
 
     def on_timer(self):
         try:
@@ -49,8 +32,19 @@ class VimpairClient(object):
 
 
 def create_client():
+    message_queue = Queue(maxsize=100)
+    connection = ClientConnection(message_queue)
     editor_controller = EditorController(
         editor_interface=VimInterface(vim=vim),
         process_callback=lambda _: None,
     )
-    return VimpairClient(editor_controller=editor_controller)
+    runloop = Runloop(
+        setup=connection.connect,
+        process=connection.retrieve,
+        cleanup=connection.disconnect,
+    )
+    return VimpairClient(
+        editor_controller=editor_controller,
+        message_queue=message_queue,
+        runloop=runloop,
+    )
