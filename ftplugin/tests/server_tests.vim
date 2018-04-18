@@ -18,17 +18,13 @@ fetch_server_output(close_connection=False)
 EOF
 endfunction
 
-function! _Vimpair_test_listen_to_server_and_shutdown()
-  call _Vimpair_test_listen_to_server()
-  python client_socket.close()
-endfunction
-
 
 function! Vimpair_server_sends_buffer_content_to_connected_client()
   call VimpairServerStart()
 
-  call _Vimpair_test_listen_to_server_and_shutdown()
+  call _Vimpair_test_listen_to_server()
 
+  python client_socket.close()
   call _Vimpair_assert_output_contains(g:Vimpair_test_content)
 endfunction
 
@@ -39,13 +35,15 @@ function! Vimpair_server_sends_buffer_content_on_changes()
   execute("normal A. Adding some more")
 
   python fetch_server_output()
+  python client_socket.close()
   call _Vimpair_assert_output_contains('Adding some more')
 endfunction
 
 function! Vimpair_server_sends_cursor_position_to_connected_client()
   call VimpairServerStart()
 
-  call _Vimpair_test_listen_to_server_and_shutdown()
+  call _Vimpair_test_listen_to_server()
+  python client_socket.close()
 
   call _Vimpair_assert_output_contains('(1, 0)')
 endfunction
@@ -55,8 +53,10 @@ function! Vimpair_server_sends_cursor_position_on_changes()
   call _Vimpair_test_listen_to_server()
 
   execute("normal A. Adding some more")
+  execute("doautocmd CursorMoved")
 
   python fetch_server_output()
+  python client_socket.close()
   call _Vimpair_assert_output_contains('(1, 17)')
 endfunction
 
